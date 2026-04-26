@@ -1,0 +1,184 @@
+{
+  "info": {
+    "_postman_id": "4836e3f0-7846-4586-b285-1628e4f7115c",
+    "name": "Elastic Search Decomposition",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43686938",
+    "_collection_link": "https://go.postman.co/collection/43686938-4836e3f0-7846-4586-b285-1628e4f7115c?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Create Product",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"mappings\": {\r\n    \"properties\": {\r\n      \"name\": { \"type\": \"text\" },\r\n      \"category\": { \"type\": \"keyword\" },\r\n      \"price\": { \"type\": \"float\" },\r\n      \"brand\": { \"type\": \"keyword\" },\r\n      \"in_stock\": { \"type\": \"boolean\" },\r\n      \"rating\": { \"type\": \"float\" }\r\n    }\r\n  }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:9200/products",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "9200",
+          "path": [
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Product Index",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:9200/products",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "9200",
+          "path": [
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Load Product",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-ndjson"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"index\":{}}\r\n{\"name\": \"Sony Bravia 4K TV\", \"category\": \"Electronics\", \"price\": 599.99, \"brand\": \"Sony\", \"in_stock\": true, \"rating\": 4.5}\r\n{\"index\":{}}\r\n{\"name\": \"Samsung Galaxy S21\", \"category\": \"Electronics\", \"price\": 799.00, \"brand\": \"Samsung\", \"in_stock\": true, \"rating\": 4.7}\r\n{\"index\":{}}\r\n{\"name\": \"Logitech Mouse\", \"category\": \"Electronics\", \"price\": 25.50, \"brand\": \"Logitech\", \"in_stock\": true, \"rating\": 4.2}\r\n{\"index\":{}}\r\n{\"name\": \"Sony Headphones\", \"category\": \"Electronics\", \"price\": 150.00, \"brand\": \"Sony\", \"in_stock\": false, \"rating\": 4.8}\r\n{\"index\":{}}\r\n{\"name\": \"Generic Toaster\", \"category\": \"Home Appliances\", \"price\": 30.00, \"brand\": \"Generic\", \"in_stock\": true, \"rating\": 3.5}\r\n{\"index\":{}}\r\n{\"name\": \"Samsung Microwave\", \"category\": \"Home Appliances\", \"price\": 120.00, \"brand\": \"Samsung\", \"in_stock\": true, \"rating\": 4.0}\r\n",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:9200/products/_bulk",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "9200",
+          "path": [
+            "products",
+            "_bulk"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Electronics Price Range & Brand Filter",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"query\": {\r\n    \"bool\": {\r\n      \"filter\": [\r\n        { \"term\": { \"category\": \"Electronics\" } },\r\n        { \"range\": { \"price\": { \"gte\": 50, \"lte\": 800 } } },\r\n        { \"term\": { \"in_stock\": true } }\r\n      ],\r\n      \"should\": [\r\n        { \"term\": { \"brand\": \"Sony\" } },\r\n        { \"term\": { \"brand\": \"Samsung\" } }\r\n      ],\r\n      \"minimum_should_match\": 1\r\n    }\r\n  }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/es-decomposition/decompose?index=products",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "es-decomposition",
+            "decompose"
+          ],
+          "query": [
+            {
+              "key": "index",
+              "value": "products"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search with Match and Rating",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"query\": {\r\n    \"bool\": {\r\n      \"must\": [\r\n        { \"match\": { \"name\": \"Sony\" } }\r\n      ],\r\n      \"filter\": [\r\n        { \"range\": { \"rating\": { \"gte\": 4.0 } } }\r\n      ]\r\n    }\r\n  }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/es-decomposition/decompose?index=products",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "es-decomposition",
+            "decompose"
+          ],
+          "query": [
+            {
+              "key": "index",
+              "value": "products"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
