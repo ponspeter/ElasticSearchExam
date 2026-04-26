@@ -3,7 +3,7 @@
 To run the provided `Dockerfile`, follow these steps:
 
 #### 1. Build the Docker Image
-Open your terminal in the project root directory (`C:\Users\ponsp\workspace\ElasticSearchExam`) and run:
+Open your terminal in the project root directory and run:
 
 ```powershell
 docker build -t elasticsearch-exam .
